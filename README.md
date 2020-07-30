@@ -2,8 +2,6 @@
 ## Task
 Train a conditional generative adversial network on the CelebA dataset. The result should be a model that generates instances of faces with the desired attribute.
 
-## Model
-
 ## Executing the code in this repository
 
 The notebook is compatible with Google Colab. 
@@ -19,4 +17,4 @@ There is also a version that can be used locally (N3_GAN_local.ipynb) that was u
 
 See the Colab Demo for a small demonstration of results.
 
-## Results
+
