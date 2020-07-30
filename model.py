@@ -38,17 +38,20 @@ def define_cond_discriminator(args):
     # concat label as a channel
     merge = Concatenate(name="Cond_D_Concatenate_1")([in_image, li])
 
-    fe = Conv2D(128, (3,3), strides=(2,2), padding='same', name="Cond_D_Conv_1")(merge)
+    fe = Conv2D(64, (3,3), strides=(2,2), padding='same', name="Cond_D_Conv_1")(merge)
     fe = LeakyReLU(alpha=0.2, name="Cond_D_LeakyRelu_1")(fe)
 
     fe = Conv2D(128, (3,3), strides=(2,2), padding='same', name="Cond_D_conv_2")(fe)
     fe = LeakyReLU(alpha=0.2, name="Cond_D_LeakyRelu_2")(fe)
 
-    fe = Conv2D(128, (3,3), strides=(2,2), padding='same', name="Cond_D_conv_3")(fe)
+    fe = Conv2D(256, (3,3), strides=(2,2), padding='same', name="Cond_D_conv_3")(fe)
     fe = LeakyReLU(alpha=0.2, name="Cond_D_LeakyRelu_3")(fe)
 
+    fe = Conv2D(512, (3,3), strides=(2,2), padding='same', name="Cond_D_conv_4")(fe)
+    fe = LeakyReLU(alpha=0.2, name="Cond_D_LeakyRelu_4")(fe)
+    
     fe = Flatten(name="Cond_D_Flatten_1")(fe)
-    fe = Dropout(0.4, name="Cond_D_Dropout_1")(fe)
+    fe = Dropout(0.3, name="Cond_D_Dropout_1")(fe)
 
     out_layer = Dense(1, activation='sigmoid', name="Cond_D_Dense_2")(fe)
 
@@ -81,37 +84,38 @@ def define_cond_generator(latent_dim, args):
     # label input
     in_label = Input(shape=(1,))
     li = Embedding(n_classes, 50)(in_label)
-    n_nodes = 4*4*1
+    n_nodes = 8*8*1
     li = Dense(n_nodes)(li)
-    li = Reshape((4, 4, 1), name="Cond_G_Reshape_2")(li)
-  
+    li = Reshape((8, 8, 1), name="Cond_G_Reshape_2")(li)
+
     # image generator input
     in_lat = Input(shape=(latent_dim,))
 
-    n_nodes = 3*4*4    # since 3 channels
+    n_nodes = 3*8*8    # since 3 channels
     gen = Dense(n_nodes)(in_lat)
-    gen = LeakyReLU(alpha=0.2)(gen)
-    gen = Reshape((4, 4, 3), name="Cond_G_Reshape_3")(gen)
+    gen = ReLU()(gen)
+    gen = Reshape((8, 8, 3), name="Cond_G_Reshape_3")(gen)
 
     merge = Concatenate()([gen, li])
-    # 4X4 to 8X8
+    
+    # 16x16
     gen = Conv2DTranspose(1024, (4,4), strides=(2,2), padding='same')(merge)
-    gen = LeakyReLU(alpha=0.2)(gen)
-    # 8X8 to 16X16
+    gen = ReLU()(gen)
+    
+    # 32x32
     gen = Conv2DTranspose(512, (4,4), strides=(2,2), padding='same')(gen)
-    gen = LeakyReLU(alpha=0.2)(gen)
-    # 16X16 to 32X32
+    gen = ReLU()(gen)
+    
+    # 64x64
     gen = Conv2DTranspose(256, (4,4), strides=(2,2), padding='same')(gen)
-    gen = LeakyReLU(alpha=0.2)(gen)
-    # 32X32 to 64X64
+    gen = ReLU()(gen)
+    
+    # 128x128
     gen = Conv2DTranspose(128, (4,4), strides=(2,2), padding='same')(gen)
-    gen = LeakyReLU(alpha=0.2)(gen)
-    # 64X64 to 128X128
-    gen = Conv2DTranspose(64, (4,4), strides=(2,2), padding='same')(gen)
-    gen = LeakyReLU(alpha=0.2)(gen)
+    gen = ReLU()(gen)
 
-    # 1X1 conv
-    out_layer = Conv2D(3, (4,4), activation='tanh', padding='same')(gen)  # or 128, 128, 3
+    # 1X1 conv, reduce channels to 3 - rgb
+    out_layer = Conv2D(3, (7, 7), activation='tanh', padding='same')(gen)  # or 128, 128
 
     model = Model([in_lat, in_label], out_layer)
     return model
