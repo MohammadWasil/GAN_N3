@@ -1,4 +1,7 @@
 # GAN_N3
+
+The research project was associated with "[INF-DSAM9] Computational Foundations of Data Science: Deep Learning", Summer Semester 2020, for my Masters of Science: Data Science, University of Potsdam, Germany. You can find the Technical Report on [ResearchGate](https://www.researchgate.net/publication/355917170_Conditional_Generative_Adversarial_Network_generate_new_face_images_based_on_attributes)
+
 ## Task
 Train a conditional generative adversial network on the CelebA dataset. The result should be a model that generates instances of faces with the desired attribute.
 
@@ -16,5 +19,3 @@ How to run the notebook:
 There is also a version that can be used locally (N3_GAN_local.ipynb) that was used in development and might be easier to understand for some.
 
 See the Colab Demo for a small demonstration of results.
-
-
